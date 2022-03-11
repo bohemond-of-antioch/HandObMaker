@@ -42,7 +42,10 @@ Partial Class MainWindow
 		Me.TextBoxThickness = New System.Windows.Forms.TextBox()
 		Me.Label5 = New System.Windows.Forms.Label()
 		Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+		Me.ButtonExportHandObXComPalette = New System.Windows.Forms.Button()
+		Me.GroupBox10 = New System.Windows.Forms.GroupBox()
 		Me.ButtonSendToUnitSpriteStudio = New System.Windows.Forms.Button()
+		Me.CheckBoxSendToUnitSpriteStudio = New System.Windows.Forms.CheckBox()
 		Me.CheckBoxOverrideMask3 = New System.Windows.Forms.CheckBox()
 		Me.GroupBox5 = New System.Windows.Forms.GroupBox()
 		Me.CheckBoxShadedCenterline = New System.Windows.Forms.CheckBox()
@@ -82,12 +85,11 @@ Partial Class MainWindow
 		Me.ListBoxRecentFiles = New System.Windows.Forms.ListBox()
 		Me.ButtonLoadFile = New System.Windows.Forms.Button()
 		Me.ButtonSaveFile = New System.Windows.Forms.Button()
-		Me.CheckBoxSendToUnitSpriteStudio = New System.Windows.Forms.CheckBox()
-		Me.GroupBox10 = New System.Windows.Forms.GroupBox()
 		CType(Me.ImageSource, System.ComponentModel.ISupportInitialize).BeginInit()
 		CType(Me.ImageDestinationHandOb, System.ComponentModel.ISupportInitialize).BeginInit()
 		Me.GroupBox1.SuspendLayout()
 		Me.GroupBox2.SuspendLayout()
+		Me.GroupBox10.SuspendLayout()
 		Me.GroupBox5.SuspendLayout()
 		Me.GroupBox6.SuspendLayout()
 		Me.GroupBox4.SuspendLayout()
@@ -96,7 +98,6 @@ Partial Class MainWindow
 		CType(Me.ImageDestinationFloorOb, System.ComponentModel.ISupportInitialize).BeginInit()
 		Me.GroupBox8.SuspendLayout()
 		Me.GroupBox9.SuspendLayout()
-		Me.GroupBox10.SuspendLayout()
 		Me.SuspendLayout()
 		'
 		'ImageSource
@@ -273,6 +274,7 @@ Partial Class MainWindow
 		'
 		'GroupBox2
 		'
+		Me.GroupBox2.Controls.Add(Me.ButtonExportHandObXComPalette)
 		Me.GroupBox2.Controls.Add(Me.GroupBox10)
 		Me.GroupBox2.Controls.Add(Me.CheckBoxOverrideMask3)
 		Me.GroupBox2.Controls.Add(Me.GroupBox5)
@@ -287,6 +289,26 @@ Partial Class MainWindow
 		Me.GroupBox2.TabStop = False
 		Me.GroupBox2.Text = "HandOb"
 		'
+		'ButtonExportHandObXComPalette
+		'
+		Me.ButtonExportHandObXComPalette.Location = New System.Drawing.Point(88, 168)
+		Me.ButtonExportHandObXComPalette.Name = "ButtonExportHandObXComPalette"
+		Me.ButtonExportHandObXComPalette.Size = New System.Drawing.Size(160, 39)
+		Me.ButtonExportHandObXComPalette.TabIndex = 21
+		Me.ButtonExportHandObXComPalette.Text = "Export HandOb in XCom Palette"
+		Me.ButtonExportHandObXComPalette.UseVisualStyleBackColor = True
+		'
+		'GroupBox10
+		'
+		Me.GroupBox10.Controls.Add(Me.ButtonSendToUnitSpriteStudio)
+		Me.GroupBox10.Controls.Add(Me.CheckBoxSendToUnitSpriteStudio)
+		Me.GroupBox10.Location = New System.Drawing.Point(576, 16)
+		Me.GroupBox10.Name = "GroupBox10"
+		Me.GroupBox10.Size = New System.Drawing.Size(200, 80)
+		Me.GroupBox10.TabIndex = 20
+		Me.GroupBox10.TabStop = False
+		Me.GroupBox10.Text = "UnitSprite Studio Integration"
+		'
 		'ButtonSendToUnitSpriteStudio
 		'
 		Me.ButtonSendToUnitSpriteStudio.Location = New System.Drawing.Point(8, 40)
@@ -295,6 +317,16 @@ Partial Class MainWindow
 		Me.ButtonSendToUnitSpriteStudio.TabIndex = 18
 		Me.ButtonSendToUnitSpriteStudio.Text = "Send"
 		Me.ButtonSendToUnitSpriteStudio.UseVisualStyleBackColor = True
+		'
+		'CheckBoxSendToUnitSpriteStudio
+		'
+		Me.CheckBoxSendToUnitSpriteStudio.AutoSize = True
+		Me.CheckBoxSendToUnitSpriteStudio.Location = New System.Drawing.Point(8, 16)
+		Me.CheckBoxSendToUnitSpriteStudio.Name = "CheckBoxSendToUnitSpriteStudio"
+		Me.CheckBoxSendToUnitSpriteStudio.Size = New System.Drawing.Size(116, 17)
+		Me.CheckBoxSendToUnitSpriteStudio.TabIndex = 19
+		Me.CheckBoxSendToUnitSpriteStudio.Text = "Send Automatically"
+		Me.CheckBoxSendToUnitSpriteStudio.UseVisualStyleBackColor = True
 		'
 		'CheckBoxOverrideMask3
 		'
@@ -681,27 +713,6 @@ Partial Class MainWindow
 		Me.ButtonSaveFile.Text = "Save"
 		Me.ButtonSaveFile.UseVisualStyleBackColor = True
 		'
-		'CheckBoxSendToUnitSpriteStudio
-		'
-		Me.CheckBoxSendToUnitSpriteStudio.AutoSize = True
-		Me.CheckBoxSendToUnitSpriteStudio.Location = New System.Drawing.Point(8, 16)
-		Me.CheckBoxSendToUnitSpriteStudio.Name = "CheckBoxSendToUnitSpriteStudio"
-		Me.CheckBoxSendToUnitSpriteStudio.Size = New System.Drawing.Size(116, 17)
-		Me.CheckBoxSendToUnitSpriteStudio.TabIndex = 19
-		Me.CheckBoxSendToUnitSpriteStudio.Text = "Send Automatically"
-		Me.CheckBoxSendToUnitSpriteStudio.UseVisualStyleBackColor = True
-		'
-		'GroupBox10
-		'
-		Me.GroupBox10.Controls.Add(Me.ButtonSendToUnitSpriteStudio)
-		Me.GroupBox10.Controls.Add(Me.CheckBoxSendToUnitSpriteStudio)
-		Me.GroupBox10.Location = New System.Drawing.Point(576, 16)
-		Me.GroupBox10.Name = "GroupBox10"
-		Me.GroupBox10.Size = New System.Drawing.Size(200, 80)
-		Me.GroupBox10.TabIndex = 20
-		Me.GroupBox10.TabStop = False
-		Me.GroupBox10.Text = "UnitSprite Studio Integration"
-		'
 		'MainWindow
 		'
 		Me.AllowDrop = True
@@ -724,6 +735,8 @@ Partial Class MainWindow
 		Me.GroupBox1.PerformLayout()
 		Me.GroupBox2.ResumeLayout(False)
 		Me.GroupBox2.PerformLayout()
+		Me.GroupBox10.ResumeLayout(False)
+		Me.GroupBox10.PerformLayout()
 		Me.GroupBox5.ResumeLayout(False)
 		Me.GroupBox5.PerformLayout()
 		Me.GroupBox6.ResumeLayout(False)
@@ -738,8 +751,6 @@ Partial Class MainWindow
 		Me.GroupBox8.PerformLayout()
 		Me.GroupBox9.ResumeLayout(False)
 		Me.GroupBox9.PerformLayout()
-		Me.GroupBox10.ResumeLayout(False)
-		Me.GroupBox10.PerformLayout()
 		Me.ResumeLayout(False)
 		Me.PerformLayout()
 
@@ -806,4 +817,5 @@ Partial Class MainWindow
 	Friend WithEvents ButtonSendToUnitSpriteStudio As Button
 	Friend WithEvents GroupBox10 As GroupBox
 	Friend WithEvents CheckBoxSendToUnitSpriteStudio As CheckBox
+	Friend WithEvents ButtonExportHandObXComPalette As Button
 End Class
