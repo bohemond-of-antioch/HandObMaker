@@ -187,48 +187,57 @@
         End With
         Return FrameParameters
     End Function
-    Private Function GatherFloorFrameParameters() As IsometricFrameParameters
-        Dim FrameParameters As New IsometricFrameParameters
-        FrameParameters = GatherFrameParameters()
-        If FrameParameters Is Nothing Then Return Nothing
+	Private Function GatherFloorFrameParameters() As IsometricFrameParameters
+		Dim FrameParameters As New IsometricFrameParameters
+		FrameParameters = GatherFrameParameters()
+		If FrameParameters Is Nothing Then Return Nothing
 
-        FrameParameters.Scale = Val(TextBoxFloorObScale.Text) / 100
-        FrameParameters.Horizontal = CheckBoxFloorObHorizontal.Checked
-        FrameParameters.TwoHanded = True
+		FrameParameters.Scale = Val(TextBoxFloorObScale.Text) / 100
+		FrameParameters.Horizontal = CheckBoxFloorObHorizontal.Checked
+		FrameParameters.TwoHanded = True
 
-        Dim BoundingBox = CalculateImageBoundingBox(BigObImage)
+		Dim BoundingBox = CalculateImageBoundingBox(BigObImage)
 
-        FrameParameters.HandPosition = New Point(BoundingBox.X + BoundingBox.Width / 2, BoundingBox.Y + BoundingBox.Height / 2)
+		FrameParameters.HandPosition = New Point(BoundingBox.X + BoundingBox.Width / 2, BoundingBox.Y + BoundingBox.Height / 2)
 
-        Return FrameParameters
-    End Function
-    Private Sub ButtonExportHandOb_Click(sender As Object, e As EventArgs) Handles ButtonExportHandOb.Click
-        Dim SaveFileDialog As New SaveFileDialog
+		Return FrameParameters
+	End Function
+	Private Sub ButtonExportHandOb_Click(sender As Object, e As EventArgs) Handles ButtonExportHandOb.Click
+		Dim SaveFileDialog As New SaveFileDialog
 
-        SaveFileDialog.Filter = "PNG file (*.png)|*.png|All Files (*.*)|*.*"
+		SaveFileDialog.Filter = "PNG file (*.png)|*.png|All Files (*.*)|*.*"
 
-        If (SaveFileDialog.ShowDialog(Me) = System.Windows.Forms.DialogResult.OK) Then
-            Dim FileName As String = SaveFileDialog.FileName
-            Dim FrameParameters As IsometricFrameParameters
-            FrameParameters = GatherFrameParameters()
-            If FrameParameters Is Nothing Then
-                MsgBox("Could not render with the selected parameters.", MsgBoxStyle.Critical)
-                Exit Sub
-            End If
+		If (SaveFileDialog.ShowDialog(Me) = System.Windows.Forms.DialogResult.OK) Then
+			Dim FileName As String = SaveFileDialog.FileName
+			Try
+				Dim ExportImage = GenerateExportImage()
+				ExportImage.Save(FileName)
+			Catch ex As Exception
+				MsgBox(ex.Message, MsgBoxStyle.Critical)
+			End Try
+		End If
+	End Sub
 
-            Dim ExportImage = New Bitmap(HandObWidth * 8, HandObHeight)
+	Public Function GenerateExportImage() As Bitmap
+		Dim FrameParameters As IsometricFrameParameters
+		FrameParameters = GatherFrameParameters()
+		If FrameParameters Is Nothing Then
+			'MsgBox("Could not render with the selected parameters.", MsgBoxStyle.Critical)
+			Throw New Exception("Could not render with the selected parameters.")
+		End If
 
-            Dim Frames = Hl.CreateHandObFrames(BigObImage, FrameParameters)
-            For f = 0 To 7
-                BitmapUtils.Blit(ExportImage, Frames(f), f * HandObWidth, 0)
-            Next
+		Dim ExportImage = New Bitmap(HandObWidth * 8, HandObHeight)
 
-            ExportImage.Save(FileName)
-        End If
+		'ExportImage.Palette = My.Resources.UFOBattlescapePalette.Palette
+		Dim Frames = Hl.CreateHandObFrames(BigObImage, FrameParameters)
+		For f = 0 To 7
+			BitmapUtils.Blit(ExportImage, Frames(f), f * HandObWidth, 0)
+		Next
 
-    End Sub
+		Return ExportImage
+	End Function
 
-    Private Sub ButtonExportFloorOb_Click(sender As Object, e As EventArgs) Handles ButtonExportFloorOb.Click
+	Private Sub ButtonExportFloorOb_Click(sender As Object, e As EventArgs) Handles ButtonExportFloorOb.Click
         Dim SaveFileDialog As New SaveFileDialog
 
         SaveFileDialog.Filter = "PNG file (*.png)|*.png|All Files (*.*)|*.*"
@@ -253,8 +262,9 @@
     Friend Sub RefreshDestinations()
         If LoadingFileInProgress Then Exit Sub
         ImageDestinationHandOb.Invalidate()
-        ImageDestinationFloorOb.Invalidate()
-    End Sub
+		ImageDestinationFloorOb.Invalidate()
+		If CheckBoxSendToUnitSpriteStudio.Checked Then IPC.SendToUnitSpriteStudio()
+	End Sub
     Private Sub ImageSource_MouseUp(sender As Object, e As MouseEventArgs) Handles ImageSource.MouseUp
         If e.Button = MouseButtons.Left Then
             HandPosition.X = e.X / 3
@@ -566,4 +576,9 @@
         If ListBoxRecentFiles.SelectedIndex = -1 Then Exit Sub
         LoadHandobFile(CType(ListBoxRecentFiles.SelectedItem, RecentFileItem).Filepath)
     End Sub
+
+	Private Sub ButtonSendToUnitSpriteStudio_Click(sender As Object, e As EventArgs) Handles ButtonSendToUnitSpriteStudio.Click
+		IPC.SendToUnitSpriteStudio()
+	End Sub
+
 End Class

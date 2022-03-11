@@ -12,12 +12,12 @@
             Next
         Next
     End Sub
-    Friend Sub Blit(DestinationImage As Bitmap, SourceImage As Bitmap, DestinationX As Integer, DestinationY As Integer)
-        Dim G = Graphics.FromImage(DestinationImage)
-        G.DrawImageUnscaled(SourceImage, DestinationX, DestinationY)
-    End Sub
+	Friend Sub Blit(DestinationImage As Bitmap, SourceImage As Bitmap, DestinationX As Integer, DestinationY As Integer)
+		Dim G = Graphics.FromImage(DestinationImage)
+		G.DrawImageUnscaled(SourceImage, DestinationX, DestinationY)
+	End Sub
 
-    Friend Function GetPixelIndex(Image As Bitmap, X As Integer, Y As Integer) As Integer
+	Friend Function GetPixelIndex(Image As Bitmap, X As Integer, Y As Integer) As Integer
         Dim PixelColor = Image.GetPixel(X, Y)
         Dim f As Integer
         For f = 0 To UBound(Image.Palette.Entries)

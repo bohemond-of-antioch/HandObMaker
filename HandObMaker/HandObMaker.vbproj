@@ -95,6 +95,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ImagePixelMap.vb" />
+    <Compile Include="IPC.vb" />
     <Compile Include="LayeredBitmap.vb" />
     <Compile Include="MainWindow.vb">
       <SubType>Form</SubType>
@@ -159,6 +160,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\UFOBattlescapePalette.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
