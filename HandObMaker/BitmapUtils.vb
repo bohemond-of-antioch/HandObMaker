@@ -138,6 +138,8 @@
 		Dim SourcePixels(BitmapData.Height * BitmapData.Stride - 1) As Byte
 		Runtime.InteropServices.Marshal.Copy(BitmapData.Scan0, SourcePixels, 0, BitmapData.Height * BitmapData.Stride)
 
+		Dim TransparentColor = My.Resources.UFOBattlescapePalette.Palette.Entries(0)
+
 		Dim x, y As Integer
 		Dim BoundingBox As Rectangle = New Rectangle()
 		BoundingBox.X = Image.Width
@@ -146,9 +148,12 @@
 		BoundingBox.Height = 0
 		For x = 0 To Image.Width - 1
 			For y = 0 To Image.Height - 1
-				Dim a As Byte
+				Dim a, r, g, b As Byte
 				a = SourcePixels(x * 4 + y * BitmapData.Stride + 3)
-				If a > 0 Then
+				r = SourcePixels(x * 4 + y * BitmapData.Stride + 2)
+				g = SourcePixels(x * 4 + y * BitmapData.Stride + 1)
+				b = SourcePixels(x * 4 + y * BitmapData.Stride + 0)
+				If a > 0 And Not (TransparentColor.R = r And TransparentColor.G = g And TransparentColor.B = b) Then
 					If x > BoundingBox.Width Then BoundingBox.Width = x
 					If y > BoundingBox.Height Then BoundingBox.Height = y
 					If x < BoundingBox.X Then BoundingBox.X = x
