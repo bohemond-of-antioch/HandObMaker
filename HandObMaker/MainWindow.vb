@@ -8,6 +8,8 @@
 	Private LoadedBigOb As String
 	Public LoadedFrontImage As String
 	Public LoadedRearImage As String
+	Public FrontImagePenetration As Integer = 1
+	Public RearImagePenetration As Integer = 1
 
 	Public ThicknessGroups As ThicknessGroup()
 	Private LoadingFileInProgress = False
@@ -44,6 +46,18 @@
 			RefreshDestinations()
 		End Try
 	End Sub
+	Friend Sub SetFrontImage(Source As Bitmap)
+		If Not FrontImage Is Nothing Then
+			FrontImage.Dispose()
+		End If
+		FrontImage = Source
+		If Not AdvancedWindow Is Nothing Then
+			AdvancedWindow.ImageFront.Width = FrontImage.Width * 3 + 2
+			AdvancedWindow.ImageFront.Height = FrontImage.Height * 3 + 2
+		End If
+		If Not AdvancedWindow Is Nothing Then AdvancedWindow.ImageFront.Invalidate()
+		RefreshDestinations()
+	End Sub
 	Friend Sub LoadFrontImage(FileName As String)
 		If Not FrontImage Is Nothing Then
 			FrontImage.Dispose()
@@ -57,8 +71,8 @@
 				FrontImage = Nothing
 			Else
 				If Not AdvancedWindow Is Nothing Then
-					AdvancedWindow.ImageFront.Width = FrontImage.Width * 3
-					AdvancedWindow.ImageFront.Height = FrontImage.Height * 3
+					AdvancedWindow.ImageFront.Width = FrontImage.Width * 3 + 2
+					AdvancedWindow.ImageFront.Height = FrontImage.Height * 3 + 2
 				End If
 			End If
 		Catch
@@ -69,6 +83,18 @@
 			If Not AdvancedWindow Is Nothing Then AdvancedWindow.ImageFront.Invalidate()
 			RefreshDestinations()
 		End Try
+	End Sub
+	Friend Sub SetRearImage(Source As Bitmap)
+		If Not RearImage Is Nothing Then
+			RearImage.Dispose()
+		End If
+		RearImage = Source
+		If Not AdvancedWindow Is Nothing Then
+			AdvancedWindow.ImageRear.Width = RearImage.Width * 3 + 2
+			AdvancedWindow.ImageRear.Height = RearImage.Height * 3 + 2
+		End If
+		If Not AdvancedWindow Is Nothing Then AdvancedWindow.ImageRear.Invalidate()
+		RefreshDestinations()
 	End Sub
 	Friend Sub LoadRearImage(FileName As String)
 		If Not RearImage Is Nothing Then
@@ -83,8 +109,8 @@
 				RearImage = Nothing
 			Else
 				If Not AdvancedWindow Is Nothing Then
-					AdvancedWindow.ImageRear.Width = RearImage.Width * 3
-					AdvancedWindow.ImageRear.Height = RearImage.Height * 3
+					AdvancedWindow.ImageRear.Width = RearImage.Width * 3 + 2
+					AdvancedWindow.ImageRear.Height = RearImage.Height * 3 + 2
 				End If
 			End If
 		Catch
@@ -156,7 +182,7 @@
 		End If
 
 	End Sub
-	Private Function GatherFrameParameters() As IsometricFrameParameters
+	Friend Function GatherFrameParameters() As IsometricFrameParameters
 		If BigObImage Is Nothing Then Return Nothing
 		If Val(TextBoxThickness.Text) < 1 Then Return Nothing
 		If Val(TextBoxItemHeight.Text) < 1 Then Return Nothing
@@ -183,6 +209,8 @@
 			.ColoringAverage.TransparencyCutoff = Val(TextBoxAvgTransparencyCutoff.Text)
 			.FrontImage = FrontImage
 			.RearImage = RearImage
+			.FrontImagePenetration = FrontImagePenetration
+			.RearImagePenetration = RearImagePenetration
 			.ThicknessGroups = ThicknessGroups
 		End With
 		Return FrameParameters
@@ -449,6 +477,7 @@
 			AdvancedWindow.Show()
 		Else
 			AdvancedWindow.Show()
+			AdvancedWindow.BringToFront()
 		End If
 	End Sub
 
@@ -491,6 +520,7 @@
 			End If
 		End If
 	End Sub
+	Private Const SaveVersion As Integer = 2
 	Private Sub ButtonSaveFile_Click(sender As Object, e As EventArgs) Handles ButtonSaveFile.Click
 		Dim SaveFileDialog As New SaveFileDialog
 
@@ -501,6 +531,8 @@
 
 			Dim File As System.IO.BinaryWriter
 			File = New System.IO.BinaryWriter(System.IO.File.Open(FileName, IO.FileMode.OpenOrCreate))
+
+			File.Write(SaveVersion)
 
 			If LoadedBigOb Is Nothing Then
 				File.Write("")
@@ -536,6 +568,9 @@
 			Else
 				File.Write(LoadedRearImage)
 			End If
+			File.Write(FrontImagePenetration)
+			File.Write(RearImagePenetration)
+
 			File.Write(ThicknessGroups.Count)
 			For Each Group In ThicknessGroups
 				File.Write(Group.Enabled)
@@ -559,6 +594,8 @@
 		Dim File As System.IO.BinaryReader
 		LoadingFileInProgress = True
 		File = New System.IO.BinaryReader(System.IO.File.Open(Filename, IO.FileMode.Open))
+
+		Dim LoadVersion As Integer = File.ReadInt32()
 
 		LoadedBigOb = File.ReadString()
 		If LoadedBigOb = "" Then LoadedBigOb = Nothing
@@ -585,7 +622,8 @@
 		LoadedRearImage = File.ReadString()
 		If LoadedFrontImage = "" Then LoadedFrontImage = Nothing
 		If LoadedRearImage = "" Then LoadedRearImage = Nothing
-
+		FrontImagePenetration = File.ReadInt32()
+		RearImagePenetration = File.ReadInt32()
 
 		Dim ThicknessGroupsCount = File.ReadInt32()
 		For Each Group In ThicknessGroups

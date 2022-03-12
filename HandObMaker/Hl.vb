@@ -52,8 +52,10 @@
         Friend ColoringMethod As EColoringMethod
         Friend ColoringAverage As ColoringAverageParameters
         Friend FrontImage As Bitmap
-        Friend RearImage As Bitmap
-        Friend ThicknessGroups As ThicknessGroup()
+		Friend RearImage As Bitmap
+		Friend FrontImagePenetration As Integer
+		Friend RearImagePenetration As Integer
+		Friend ThicknessGroups As ThicknessGroup()
     End Class
     Const IsometricSquash = 0.75
     Friend Function Mirror(Image As Bitmap) As Bitmap
@@ -129,19 +131,20 @@
 
         Dim SourceSize As Size = New Size(Parameters.ItemSize.Width * BigObGrid, Parameters.ItemSize.Height * BigObGrid)
 
-        Dim EdgeFront As Integer()
-        Dim EdgeRear As Integer()
+		Dim SurfaceFront As Integer(,)
+		Dim SurfaceRear As Integer(,)
 
-        If Not Parameters.FrontImage Is Nothing Then
+
+		If Not Parameters.FrontImage Is Nothing Then
             SyncLock BigOb
-                EdgeFront = BitmapUtils.CalculateEdge(BigOb, EEdge.Front)
-            End SyncLock
+				SurfaceFront = SourceImage.GenerateSurface(EEdge.Front)
+			End SyncLock
         End If
         If Not Parameters.RearImage Is Nothing Then
             SyncLock BigOb
-                EdgeRear = BitmapUtils.CalculateEdge(BigOb, EEdge.Rear)
-            End SyncLock
-        End If
+				SurfaceRear = SourceImage.GenerateSurface(EEdge.Rear)
+			End SyncLock
+		End If
 
         If Parameters.HandPosition.X < 0 Or Parameters.HandPosition.X > SourceSize.Width Or Parameters.HandPosition.Y < 0 Or Parameters.HandPosition.Y > SourceSize.Height Then Return New Bitmap(HandObWidth, HandObHeight)
 
@@ -284,64 +287,87 @@
         ReDim Pixels(MakeIsometricFrame.Width, MakeIsometricFrame.Height)
 
 
-        Dim ScanPosition As IntVector3
-        ScanPosition.Z = Origin.Z
+		Dim ScanPosition As IntVector3
 
-        For z = 0 To Size.Z - 1
-            ScanPosition.X = Origin.X
-            For x = 0 To Size.X - 1
-                ScanPosition.Y = Origin.Y
-                For y = 0 To Size.Y - 1
-                    Dim DrawingPoint As Point
-                    DrawingPoint.X = ProjectionX.X * (ScanPosition.X - Parameters.HandPosition.X) + ProjectionX.Y * (ScanPosition.Y - Parameters.HandPosition.Y) + ProjectionX.Z * (ScanPosition.Z - Math.Floor(Size.Z / 2)) + HandOffset.X
-                    DrawingPoint.Y = ProjectionY.X * (ScanPosition.X - Parameters.HandPosition.X) + ProjectionY.Y * (ScanPosition.Y - Parameters.HandPosition.Y) + ProjectionY.Z * (ScanPosition.Z - Math.Floor(Size.Z / 2)) + HandOffset.Y
+		ScanPosition.Z = Origin.Z
+		For z = 0 To Size.Z - 1
+			ScanPosition.X = Origin.X
+			For x = 0 To Size.X - 1
+				ScanPosition.Y = Origin.Y
+				For y = 0 To Size.Y - 1
+					Dim CurrentScanPosition As IntVector3 = ScanPosition
+					ScanPosition.Y += ScanDirection.Y
+					Dim DrawColor As Color
+					DrawColor = SourceImage.GetPixel(CurrentScanPosition.X, CurrentScanPosition.Y, CurrentScanPosition.Z)
+					If DrawColor = TransparentColor Then Continue For
 
-                    'Debug.Print("Scan position = " + ScanPosition.ToString)
-                    Dim CurrentScanPosition As IntVector3 = ScanPosition
-                    ScanPosition.Y += ScanDirection.Y
-                    If DrawingPoint.X < 0 Or DrawingPoint.X >= MakeIsometricFrame.Width Or DrawingPoint.Y < 0 Or DrawingPoint.Y >= MakeIsometricFrame.Height Then
-                        Continue For
-                    End If
-                    Dim DrawColor As Color
-                    Select Case Parameters.ColoringMethod
-                        Case EColoringMethod.Last
-                            DrawColor = SourceImage.GetPixel(CurrentScanPosition.X, CurrentScanPosition.Y, CurrentScanPosition.Z)
-                        Case EColoringMethod.Average
-                            DrawColor = CalculateAverageColor(SourceImage, CurrentScanPosition.X, CurrentScanPosition.Y, CurrentScanPosition.Z, Parameters.ColoringAverage.Radius, Parameters.ColoringAverage.RadiusWeight, Parameters.ColoringAverage.RadiusWeightFalloff, Parameters.ColoringAverage.TransparencyCutoff, TransparentColor)
-                    End Select
-                    If DrawColor = TransparentColor Then Continue For
-                    If Not Parameters.FrontImage Is Nothing Then
-                        SyncLock Parameters.FrontImage
-                            If EdgeFront(CurrentScanPosition.X) = CurrentScanPosition.Y And CurrentScanPosition.X < Parameters.FrontImage.Height And CurrentScanPosition.Z < Parameters.FrontImage.Width Then
-                                Dim FrontPixel = Parameters.FrontImage.GetPixel(CurrentScanPosition.Z, CurrentScanPosition.X)
-                                If FrontPixel <> TransparentColor Then
-                                    DrawColor = FrontPixel
-                                End If
-                            End If
-                        End SyncLock
-                    End If
-                    If Not Parameters.RearImage Is Nothing Then
-                        SyncLock Parameters.FrontImage
-                            If EdgeRear(CurrentScanPosition.X) = CurrentScanPosition.Y And CurrentScanPosition.X < Parameters.RearImage.Height And CurrentScanPosition.Z < Parameters.RearImage.Width Then
-                                Dim RearPixel = Parameters.RearImage.GetPixel(CurrentScanPosition.Z, CurrentScanPosition.X)
-                                If RearPixel <> TransparentColor Then
-                                    DrawColor = RearPixel
-                                End If
-                            End If
-                        End SyncLock
-                    End If
-                    If Parameters.ShadedCenterline Then
-                        If ScanPosition.Z - Math.Floor(Size.Z / 2) = 0 Then
-                            DrawColor = Color.FromArgb(Math.Min(255, DrawColor.R + 16), Math.Min(255, DrawColor.G + 16), Math.Min(255, DrawColor.B + 16))
-                        End If
-                    End If
-                    Pixels(DrawingPoint.X, DrawingPoint.Y) = DrawColor
-                Next y
-                ScanPosition.X += ScanDirection.X
-            Next x
-            ScanPosition.Z += ScanDirection.Z
-        Next z
-        For x = 0 To MakeIsometricFrame.Width - 1
+
+				Next y
+			Next x
+		Next z
+
+		ScanPosition.Z = Origin.Z
+		For z = 0 To Size.Z - 1
+			ScanPosition.X = Origin.X
+			For x = 0 To Size.X - 1
+				ScanPosition.Y = Origin.Y
+				For y = 0 To Size.Y - 1
+					Dim DrawingPoint As Point
+					DrawingPoint.X = ProjectionX.X * (ScanPosition.X - Parameters.HandPosition.X) + ProjectionX.Y * (ScanPosition.Y - Parameters.HandPosition.Y) + ProjectionX.Z * (ScanPosition.Z - Math.Floor(Size.Z / 2)) + HandOffset.X
+					DrawingPoint.Y = ProjectionY.X * (ScanPosition.X - Parameters.HandPosition.X) + ProjectionY.Y * (ScanPosition.Y - Parameters.HandPosition.Y) + ProjectionY.Z * (ScanPosition.Z - Math.Floor(Size.Z / 2)) + HandOffset.Y
+
+					'Debug.Print("Scan position = " + ScanPosition.ToString)
+					Dim CurrentScanPosition As IntVector3 = ScanPosition
+					ScanPosition.Y += ScanDirection.Y
+					If DrawingPoint.X < 0 Or DrawingPoint.X >= MakeIsometricFrame.Width Or DrawingPoint.Y < 0 Or DrawingPoint.Y >= MakeIsometricFrame.Height Then
+						Continue For
+					End If
+					Dim DrawColor As Color
+					Select Case Parameters.ColoringMethod
+						Case EColoringMethod.Last
+							DrawColor = SourceImage.GetPixel(CurrentScanPosition.X, CurrentScanPosition.Y, CurrentScanPosition.Z)
+						Case EColoringMethod.Average
+							DrawColor = CalculateAverageColor(SourceImage, CurrentScanPosition.X, CurrentScanPosition.Y, CurrentScanPosition.Z, Parameters.ColoringAverage.Radius, Parameters.ColoringAverage.RadiusWeight, Parameters.ColoringAverage.RadiusWeightFalloff, Parameters.ColoringAverage.TransparencyCutoff, TransparentColor)
+					End Select
+					If DrawColor = TransparentColor Then Continue For
+					If Not Parameters.FrontImage Is Nothing Then
+						SyncLock Parameters.FrontImage
+							'If EdgeFront(CurrentScanPosition.X) = CurrentScanPosition.Y And CurrentScanPosition.X < Parameters.FrontImage.Height And CurrentScanPosition.Z < Parameters.FrontImage.Width Then
+							If CurrentScanPosition.Y >= SurfaceFront(CurrentScanPosition.X, CurrentScanPosition.Z) And CurrentScanPosition.Y < SurfaceFront(CurrentScanPosition.X, CurrentScanPosition.Z) + Parameters.FrontImagePenetration And CurrentScanPosition.X < Parameters.FrontImage.Height And CurrentScanPosition.Z < Parameters.FrontImage.Width Then
+								Dim FrontPixel = Parameters.FrontImage.GetPixel(CurrentScanPosition.Z, CurrentScanPosition.X)
+								If FrontPixel <> TransparentColor And FrontPixel.A > 0 Then
+									DrawColor = FrontPixel
+								Else
+									Continue For
+								End If
+							End If
+						End SyncLock
+					End If
+					If Not Parameters.RearImage Is Nothing Then
+						SyncLock Parameters.RearImage
+							'If EdgeRear(CurrentScanPosition.X) = CurrentScanPosition.Y And CurrentScanPosition.X < Parameters.RearImage.Height And CurrentScanPosition.Z < Parameters.RearImage.Width Then
+							If CurrentScanPosition.Y > SurfaceRear(CurrentScanPosition.X, CurrentScanPosition.Z) - Parameters.RearImagePenetration And CurrentScanPosition.Y <= SurfaceRear(CurrentScanPosition.X, CurrentScanPosition.Z) And CurrentScanPosition.X < Parameters.RearImage.Height And CurrentScanPosition.Z < Parameters.RearImage.Width Then
+								Dim RearPixel = Parameters.RearImage.GetPixel(CurrentScanPosition.Z, CurrentScanPosition.X)
+								If RearPixel <> TransparentColor And RearPixel.A > 0 Then
+									DrawColor = RearPixel
+								Else
+									Continue For
+								End If
+							End If
+						End SyncLock
+					End If
+					If Parameters.ShadedCenterline Then
+						If ScanPosition.Z - Math.Floor(Size.Z / 2) = 0 Then
+							DrawColor = Color.FromArgb(Math.Min(255, DrawColor.R + 16), Math.Min(255, DrawColor.G + 16), Math.Min(255, DrawColor.B + 16))
+						End If
+					End If
+					Pixels(DrawingPoint.X, DrawingPoint.Y) = DrawColor
+				Next y
+				ScanPosition.X += ScanDirection.X
+			Next x
+			ScanPosition.Z += ScanDirection.Z
+		Next z
+		For x = 0 To MakeIsometricFrame.Width - 1
             For y = 0 To MakeIsometricFrame.Height - 1
                 MakeIsometricFrame.SetPixel(x, y, Pixels(x, y))
             Next

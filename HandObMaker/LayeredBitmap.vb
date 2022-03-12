@@ -59,4 +59,32 @@
         End If
     End Function
 
+	Friend Function GenerateSurface(Edge As EEdge) As Integer(,)
+		Dim Result(ImageSize.Width, Size.Z) As Integer
+		Dim x, z As Integer
+		Dim StartY As Integer
+		Dim RayY As Integer
+		Select Case Edge
+			Case EEdge.Front
+				StartY = 0
+				RayY = 1
+			Case EEdge.Rear
+				StartY = ImageSize.Height - 1
+				RayY = -1
+		End Select
+		For x = 0 To ImageSize.Width - 1
+			For z = 0 To Size.Z - 1
+				Dim y = StartY
+				Do While y >= 0 AndAlso y < ImageSize.Height AndAlso GetPixel(x, y, z) = TransparentColor
+					y += RayY
+				Loop
+				If y < 0 Or y >= ImageSize.Height Then
+					Result(x, z) = StartY
+				Else
+					Result(x, z) = y
+				End If
+			Next z
+		Next x
+		Return Result
+	End Function
 End Class
