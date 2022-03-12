@@ -17,28 +17,30 @@
     End Property
 
     Private Pixels As Color(,)
-    Public Sub New(ByRef Image As Bitmap, Size As IntVector3, DefaultThickness As Integer, ThicknessGroups As ThicknessGroup())
-        Me.Size = Size
-        ImageSize.Width = Image.Width
-        ImageSize.Height = Image.Height
-        Me.ThicknessGroups = ThicknessGroups
-        Me.DefaultThickness = DefaultThickness
+	Public Sub New(ByRef Image As Bitmap, Size As IntVector3, DefaultThickness As Integer, ThicknessGroups As ThicknessGroup())
+		SyncLock Image
+			Me.Size = Size
+			ImageSize.Width = Image.Width
+			ImageSize.Height = Image.Height
+			Me.ThicknessGroups = ThicknessGroups
+			Me.DefaultThickness = DefaultThickness
 
-        If Image.Palette.Entries.Length = 0 Then
-            TransparentColor = Image.GetPixel(0, 0)
-        Else
-            TransparentColor = Image.Palette.Entries(0)
-        End If
+			If Image.Palette.Entries.Length = 0 Then
+				TransparentColor = Image.GetPixel(0, 0)
+			Else
+				TransparentColor = Image.Palette.Entries(0)
+			End If
 
-        ReDim Pixels(Image.Width, Image.Height)
-        For x = 0 To Image.Width - 1
-            For y = 0 To Image.Height - 1
-                Pixels(x, y) = Image.GetPixel(x, y)
-            Next
-        Next
-    End Sub
+			ReDim Pixels(Image.Width, Image.Height)
+			For x = 0 To Image.Width - 1
+				For y = 0 To Image.Height - 1
+					Pixels(x, y) = Image.GetPixel(x, y)
+				Next
+			Next
+		End SyncLock
+	End Sub
 
-    Public Function GetPixel(X As Integer, Y As Integer, Z As Integer) As Color
+	Public Function GetPixel(X As Integer, Y As Integer, Z As Integer) As Color
         Dim LocalThickness = DefaultThickness
         For Each Group In ThicknessGroups
             If Group.Enabled Then

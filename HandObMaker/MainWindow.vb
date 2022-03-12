@@ -211,43 +211,23 @@
 			Dim FileName As String = SaveFileDialog.FileName
 			Try
 				Dim GeneratedImage = GenerateExportImage()
-				Dim TransformedPixels(GeneratedImage.Width * GeneratedImage.Height - 1) As Byte
-				Dim BitmapData = GeneratedImage.LockBits(New Rectangle(0, 0, GeneratedImage.Width, GeneratedImage.Height), Imaging.ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppArgb)
+				Dim ExportImage = BitmapUtils.ConvertToPalette(GeneratedImage, My.Resources.UFOBattlescapePalette.Palette)
+				ExportImage.Save(FileName)
+			Catch ex As Exception
+				MsgBox(ex.Message, MsgBoxStyle.Critical)
+			End Try
+		End If
+	End Sub
+	Private Sub ButtonExportHandObTFTDPalette_Click(sender As Object, e As EventArgs) Handles ButtonExportHandObTFTDPalette.Click
+		Dim SaveFileDialog As New SaveFileDialog
 
-				Dim SourcePixels(BitmapData.Height * BitmapData.Stride - 1) As Byte
-				Runtime.InteropServices.Marshal.Copy(BitmapData.Scan0, SourcePixels, 0, BitmapData.Height * BitmapData.Stride)
-				Dim Palette = My.Resources.UFOBattlescapePalette.Palette.Entries
-				For f = 0 To UBound(TransformedPixels)
-					Dim a, r, g, b As Integer
-					a = SourcePixels(f * 4 + 3)
-					r = SourcePixels(f * 4 + 2)
-					g = SourcePixels(f * 4 + 1)
-					b = SourcePixels(f * 4 + 0)
+		SaveFileDialog.Filter = "PNG file (*.png)|*.png|All Files (*.*)|*.*"
 
-					If a = 0 Then
-						TransformedPixels(f) = 0
-					Else
-						Dim BestMatchIndex As Byte
-						Dim BestCloseness As UInt32 = 256 * 256 * 256
-						For p = 0 To 255
-							Dim RDelta As UInt32 = Math.Abs(r - Palette(p).R)
-							Dim GDelta As UInt32 = Math.Abs(g - Palette(p).G)
-							Dim BDelta As UInt32 = Math.Abs(b - Palette(p).B)
-							Dim Closeness As UInt32 = RDelta * RDelta + GDelta * GDelta + BDelta * BDelta
-							If Closeness < BestCloseness Then
-								BestCloseness = Closeness
-								BestMatchIndex = p
-								If Closeness = 0 Then Exit For
-							End If
-						Next
-						TransformedPixels(f) = BestMatchIndex
-					End If
-				Next
-				GeneratedImage.UnlockBits(BitmapData)
-				Dim scan0 As IntPtr
-				scan0 = Runtime.InteropServices.Marshal.UnsafeAddrOfPinnedArrayElement(TransformedPixels, 0)
-				Dim ExportImage = New Bitmap(GeneratedImage.Width, GeneratedImage.Height, GeneratedImage.Width, Imaging.PixelFormat.Format8bppIndexed, scan0)
-				ExportImage.Palette = My.Resources.UFOBattlescapePalette.Palette
+		If (SaveFileDialog.ShowDialog(Me) = System.Windows.Forms.DialogResult.OK) Then
+			Dim FileName As String = SaveFileDialog.FileName
+			Try
+				Dim GeneratedImage = GenerateExportImage()
+				Dim ExportImage = BitmapUtils.ConvertToPalette(GeneratedImage, My.Resources.TFTDBattlescapePalette.Palette)
 				ExportImage.Save(FileName)
 			Catch ex As Exception
 				MsgBox(ex.Message, MsgBoxStyle.Critical)
@@ -312,6 +292,47 @@
 			ExportImage.Save(FileName)
 		End If
 	End Sub
+	Private Sub ButtonExportFloorObUFOPalette_Click(sender As Object, e As EventArgs) Handles ButtonExportFloorObUFOPalette.Click
+		Dim SaveFileDialog As New SaveFileDialog
+
+		SaveFileDialog.Filter = "PNG file (*.png)|*.png|All Files (*.*)|*.*"
+
+		If (SaveFileDialog.ShowDialog(Me) = System.Windows.Forms.DialogResult.OK) Then
+			Dim FileName As String = SaveFileDialog.FileName
+			Dim FrameParameters As IsometricFrameParameters
+			FrameParameters = GatherFloorFrameParameters()
+			If FrameParameters Is Nothing Then
+				MsgBox("Could not render with the selected parameters.", MsgBoxStyle.Critical)
+				Exit Sub
+			End If
+
+			Dim Frame = Hl.CreateFloorObFrame(BigObImage, FrameParameters)
+			Dim ExportImage = BitmapUtils.ConvertToPalette(Frame, My.Resources.UFOBattlescapePalette.Palette)
+
+			ExportImage.Save(FileName)
+		End If
+	End Sub
+
+	Private Sub ButtonExportFloorObTFTDPalette_Click(sender As Object, e As EventArgs) Handles ButtonExportFloorObTFTDPalette.Click
+		Dim SaveFileDialog As New SaveFileDialog
+
+		SaveFileDialog.Filter = "PNG file (*.png)|*.png|All Files (*.*)|*.*"
+
+		If (SaveFileDialog.ShowDialog(Me) = System.Windows.Forms.DialogResult.OK) Then
+			Dim FileName As String = SaveFileDialog.FileName
+			Dim FrameParameters As IsometricFrameParameters
+			FrameParameters = GatherFloorFrameParameters()
+			If FrameParameters Is Nothing Then
+				MsgBox("Could not render with the selected parameters.", MsgBoxStyle.Critical)
+				Exit Sub
+			End If
+
+			Dim Frame = Hl.CreateFloorObFrame(BigObImage, FrameParameters)
+			Dim ExportImage = BitmapUtils.ConvertToPalette(Frame, My.Resources.TFTDBattlescapePalette.Palette)
+
+			ExportImage.Save(FileName)
+		End If
+	End Sub
 	Friend Sub RefreshDestinations()
 		If LoadingFileInProgress Then Exit Sub
 		ImageDestinationHandOb.Invalidate()
@@ -319,6 +340,14 @@
 		If CheckBoxSendToUnitSpriteStudio.Checked Then IPC.SendToUnitSpriteStudio()
 	End Sub
 	Private Sub ImageSource_MouseUp(sender As Object, e As MouseEventArgs) Handles ImageSource.MouseUp
+		If e.Button = MouseButtons.Left Then
+			HandPosition.X = e.X / 3
+			HandPosition.Y = e.Y / 3
+			ImageSource.Invalidate()
+			RefreshDestinations()
+		End If
+	End Sub
+	Private Sub ImageSource_MouseMove(sender As Object, e As MouseEventArgs) Handles ImageSource.MouseMove
 		If e.Button = MouseButtons.Left Then
 			HandPosition.X = e.X / 3
 			HandPosition.Y = e.Y / 3
@@ -337,7 +366,6 @@
 			If FrameParameters Is Nothing Then
 				Exit Sub
 			End If
-
 			Dim Frames = Hl.CreateHandObFrames(BigObImage, FrameParameters)
 			For f = 0 To 7
 				BitmapUtils.BlitNx(G, Frames(f), f * HandObWidth * 3, 0)
@@ -378,18 +406,21 @@
 		End Try
 	End Sub
 	Private Sub ButtonMirror_Click(sender As Object, e As EventArgs) Handles ButtonMirror.Click
+		If BigObImage Is Nothing Then Exit Sub
 		BigObImage = Mirror(BigObImage)
 		ImageSource.Invalidate()
 		RefreshDestinations()
 	End Sub
 
 	Private Sub ButtonFlip_Click(sender As Object, e As EventArgs) Handles ButtonFlip.Click
+		If BigObImage Is Nothing Then Exit Sub
 		BigObImage = Flip(BigObImage)
 		ImageSource.Invalidate()
 		RefreshDestinations()
 	End Sub
 
 	Private Sub ButtonFindCenter_Click(sender As Object, e As EventArgs) Handles ButtonFindCenter.Click
+		If BigObImage Is Nothing Then Exit Sub
 		Dim BoundingBox = BitmapUtils.CalculateImageBoundingBox(BigObImage)
 		HandPosition.X = BoundingBox.X + BoundingBox.Width / 2
 		HandPosition.Y = BoundingBox.Y + BoundingBox.Height / 2

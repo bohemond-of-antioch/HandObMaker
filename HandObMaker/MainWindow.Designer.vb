@@ -42,6 +42,7 @@ Partial Class MainWindow
 		Me.TextBoxThickness = New System.Windows.Forms.TextBox()
 		Me.Label5 = New System.Windows.Forms.Label()
 		Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+		Me.ButtonExportHandObTFTDPalette = New System.Windows.Forms.Button()
 		Me.ButtonExportHandObXComPalette = New System.Windows.Forms.Button()
 		Me.GroupBox10 = New System.Windows.Forms.GroupBox()
 		Me.ButtonSendToUnitSpriteStudio = New System.Windows.Forms.Button()
@@ -73,6 +74,8 @@ Partial Class MainWindow
 		Me.Label9 = New System.Windows.Forms.Label()
 		Me.TextBoxHandSize = New System.Windows.Forms.TextBox()
 		Me.GroupBox7 = New System.Windows.Forms.GroupBox()
+		Me.ButtonExportFloorObTFTDPalette = New System.Windows.Forms.Button()
+		Me.ButtonExportFloorObUFOPalette = New System.Windows.Forms.Button()
 		Me.ButtonExportFloorOb = New System.Windows.Forms.Button()
 		Me.ImageDestinationFloorOb = New System.Windows.Forms.PictureBox()
 		Me.GroupBox8 = New System.Windows.Forms.GroupBox()
@@ -172,7 +175,7 @@ Partial Class MainWindow
 		'
 		Me.ButtonExportHandOb.Location = New System.Drawing.Point(8, 168)
 		Me.ButtonExportHandOb.Name = "ButtonExportHandOb"
-		Me.ButtonExportHandOb.Size = New System.Drawing.Size(75, 39)
+		Me.ButtonExportHandOb.Size = New System.Drawing.Size(75, 48)
 		Me.ButtonExportHandOb.TabIndex = 9
 		Me.ButtonExportHandOb.Text = "Export HandOb"
 		Me.ButtonExportHandOb.UseVisualStyleBackColor = True
@@ -274,6 +277,7 @@ Partial Class MainWindow
 		'
 		'GroupBox2
 		'
+		Me.GroupBox2.Controls.Add(Me.ButtonExportHandObTFTDPalette)
 		Me.GroupBox2.Controls.Add(Me.ButtonExportHandObXComPalette)
 		Me.GroupBox2.Controls.Add(Me.GroupBox10)
 		Me.GroupBox2.Controls.Add(Me.CheckBoxOverrideMask3)
@@ -289,13 +293,22 @@ Partial Class MainWindow
 		Me.GroupBox2.TabStop = False
 		Me.GroupBox2.Text = "HandOb"
 		'
+		'ButtonExportHandObTFTDPalette
+		'
+		Me.ButtonExportHandObTFTDPalette.Location = New System.Drawing.Point(88, 192)
+		Me.ButtonExportHandObTFTDPalette.Name = "ButtonExportHandObTFTDPalette"
+		Me.ButtonExportHandObTFTDPalette.Size = New System.Drawing.Size(160, 24)
+		Me.ButtonExportHandObTFTDPalette.TabIndex = 22
+		Me.ButtonExportHandObTFTDPalette.Text = "Export in TFTD Palette"
+		Me.ButtonExportHandObTFTDPalette.UseVisualStyleBackColor = True
+		'
 		'ButtonExportHandObXComPalette
 		'
 		Me.ButtonExportHandObXComPalette.Location = New System.Drawing.Point(88, 168)
 		Me.ButtonExportHandObXComPalette.Name = "ButtonExportHandObXComPalette"
-		Me.ButtonExportHandObXComPalette.Size = New System.Drawing.Size(160, 39)
+		Me.ButtonExportHandObXComPalette.Size = New System.Drawing.Size(160, 24)
 		Me.ButtonExportHandObXComPalette.TabIndex = 21
-		Me.ButtonExportHandObXComPalette.Text = "Export HandOb in XCom Palette"
+		Me.ButtonExportHandObXComPalette.Text = "Export in UFO-EU Palette"
 		Me.ButtonExportHandObXComPalette.UseVisualStyleBackColor = True
 		'
 		'GroupBox10
@@ -584,6 +597,8 @@ Partial Class MainWindow
 		'
 		'GroupBox7
 		'
+		Me.GroupBox7.Controls.Add(Me.ButtonExportFloorObTFTDPalette)
+		Me.GroupBox7.Controls.Add(Me.ButtonExportFloorObUFOPalette)
 		Me.GroupBox7.Controls.Add(Me.ButtonExportFloorOb)
 		Me.GroupBox7.Controls.Add(Me.ImageDestinationFloorOb)
 		Me.GroupBox7.Controls.Add(Me.GroupBox8)
@@ -594,11 +609,29 @@ Partial Class MainWindow
 		Me.GroupBox7.TabStop = False
 		Me.GroupBox7.Text = "FloorOb"
 		'
+		'ButtonExportFloorObTFTDPalette
+		'
+		Me.ButtonExportFloorObTFTDPalette.Location = New System.Drawing.Point(72, 112)
+		Me.ButtonExportFloorObTFTDPalette.Name = "ButtonExportFloorObTFTDPalette"
+		Me.ButtonExportFloorObTFTDPalette.Size = New System.Drawing.Size(48, 24)
+		Me.ButtonExportFloorObTFTDPalette.TabIndex = 21
+		Me.ButtonExportFloorObTFTDPalette.Text = "TFTD"
+		Me.ButtonExportFloorObTFTDPalette.UseVisualStyleBackColor = True
+		'
+		'ButtonExportFloorObUFOPalette
+		'
+		Me.ButtonExportFloorObUFOPalette.Location = New System.Drawing.Point(72, 88)
+		Me.ButtonExportFloorObUFOPalette.Name = "ButtonExportFloorObUFOPalette"
+		Me.ButtonExportFloorObUFOPalette.Size = New System.Drawing.Size(48, 24)
+		Me.ButtonExportFloorObUFOPalette.TabIndex = 20
+		Me.ButtonExportFloorObUFOPalette.Text = "UFO"
+		Me.ButtonExportFloorObUFOPalette.UseVisualStyleBackColor = True
+		'
 		'ButtonExportFloorOb
 		'
-		Me.ButtonExportFloorOb.Location = New System.Drawing.Point(8, 96)
+		Me.ButtonExportFloorOb.Location = New System.Drawing.Point(8, 88)
 		Me.ButtonExportFloorOb.Name = "ButtonExportFloorOb"
-		Me.ButtonExportFloorOb.Size = New System.Drawing.Size(75, 39)
+		Me.ButtonExportFloorOb.Size = New System.Drawing.Size(56, 48)
 		Me.ButtonExportFloorOb.TabIndex = 19
 		Me.ButtonExportFloorOb.Text = "Export FloorOb"
 		Me.ButtonExportFloorOb.UseVisualStyleBackColor = True
@@ -818,4 +851,7 @@ Partial Class MainWindow
 	Friend WithEvents GroupBox10 As GroupBox
 	Friend WithEvents CheckBoxSendToUnitSpriteStudio As CheckBox
 	Friend WithEvents ButtonExportHandObXComPalette As Button
+	Friend WithEvents ButtonExportHandObTFTDPalette As Button
+	Friend WithEvents ButtonExportFloorObTFTDPalette As Button
+	Friend WithEvents ButtonExportFloorObUFOPalette As Button
 End Class

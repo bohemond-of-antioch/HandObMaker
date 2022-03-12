@@ -170,6 +170,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="HandObMakerIcon.ico" />
+    <Resource Include="Resources\TFTDBattlescapePalette.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\UFOBattlescapePalette.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
