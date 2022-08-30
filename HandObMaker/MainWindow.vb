@@ -651,6 +651,63 @@
 		AddRecentFile(Filename)
 	End Sub
 
+	Private Sub LoadOldHandobFile(Filename As String)
+		Dim File As System.IO.BinaryReader
+		LoadingFileInProgress = True
+		File = New System.IO.BinaryReader(System.IO.File.Open(Filename, IO.FileMode.Open))
+
+		LoadedBigOb = File.ReadString()
+		If LoadedBigOb = "" Then LoadedBigOb = Nothing
+
+		HandPosition.X = File.ReadInt32()
+		HandPosition.Y = File.ReadInt32()
+		CheckBoxTwoHanded.Checked = File.ReadBoolean()
+		CheckBoxHorizontal.Checked = File.ReadBoolean()
+		TextBoxScalingFactor.Text = Trim(Str(File.ReadDouble()))
+		TextBoxVerticalAspect.Text = Trim(Str(File.ReadDouble()))
+		TextBoxItemWidth.Text = Trim(Str(File.ReadDouble()))
+		TextBoxItemHeight.Text = Trim(Str(File.ReadDouble()))
+		TextBoxThickness.Text = Trim(Str(File.ReadDouble()))
+		ComboBoxColoringMethod.SelectedIndex = File.ReadInt32()
+		CheckBoxShadedCenterline.Checked = File.ReadBoolean()
+		CheckBoxMaskHand.Checked = File.ReadBoolean()
+		TextBoxHandSize.Text = Trim(Str(File.ReadDouble()))
+		CheckBoxOverrideMask3.Checked = File.Read
+		TextBoxAvgRadius.Text = Trim(Str(File.ReadDouble()))
+		TextBoxAvgRadiusWeight.Text = Trim(Str(File.ReadDouble()))
+		TextBoxAvgRadiusFalloff.Text = Trim(Str(File.ReadDouble()))
+		TextBoxAvgTransparencyCutoff.Text = Trim(Str(File.ReadDouble()))
+		LoadedFrontImage = File.ReadString()
+		LoadedRearImage = File.ReadString()
+		If LoadedFrontImage = "" Then LoadedFrontImage = Nothing
+		If LoadedRearImage = "" Then LoadedRearImage = Nothing
+
+		Dim ThicknessGroupsCount = File.ReadInt32()
+		For Each Group In ThicknessGroups
+			Group.Enabled = File.ReadBoolean()
+			Group.Color = Color.FromArgb(File.ReadInt32())
+			Group.Thickness = File.ReadInt32()
+			Group.Areas.Clear()
+			Dim GroupAreasCount = File.ReadInt32()
+			For f = 1 To GroupAreasCount
+				Dim Area As New ThicknessGroup.Box
+				Area.Left = File.ReadInt32()
+				Area.Right = File.ReadInt32()
+				Area.Top = File.ReadInt32()
+				Area.Bottom = File.ReadInt32()
+				Group.AddArea(Area)
+			Next
+		Next
+
+		File.Close()
+		If Not LoadedBigOb Is Nothing Then LoadSourceImage(LoadedBigOb)
+		If Not LoadedFrontImage Is Nothing Then LoadFrontImage(LoadedFrontImage)
+		If Not LoadedRearImage Is Nothing Then LoadRearImage(LoadedRearImage)
+		LoadingFileInProgress = False
+		RefreshDestinations()
+		AddRecentFile(Filename)
+	End Sub
+
 	Private Sub ButtonLoadFile_Click(sender As Object, e As EventArgs) Handles ButtonLoadFile.Click
 		Dim OpenFileDialog As New OpenFileDialog
 		OpenFileDialog.Filter = "HandOb files (*.handob)|*.handob|All Files (*.*)|*.*"
@@ -659,6 +716,16 @@
 			Dim FileName As String
 			FileName = OpenFileDialog.FileName
 			LoadHandobFile(FileName)
+		End If
+	End Sub
+	Private Sub ButtonLoadOldFile_Click(sender As Object, e As EventArgs) Handles ButtonLoadOldFile.Click
+		Dim OpenFileDialog As New OpenFileDialog
+		OpenFileDialog.Filter = "HandOb files (*.handob)|*.handob|All Files (*.*)|*.*"
+		OpenFileDialog.Multiselect = False
+		If (OpenFileDialog.ShowDialog(Me) = System.Windows.Forms.DialogResult.OK) Then
+			Dim FileName As String
+			FileName = OpenFileDialog.FileName
+			LoadOldHandobFile(FileName)
 		End If
 	End Sub
 

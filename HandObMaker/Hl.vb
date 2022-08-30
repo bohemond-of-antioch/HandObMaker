@@ -92,11 +92,7 @@
 		CalculateItemSize.Width = Math.Ceiling((BoundingBox.X + BoundingBox.Width) / BigObGrid)
 		CalculateItemSize.Height = Math.Ceiling((BoundingBox.Y + BoundingBox.Height) / BigObGrid)
 	End Function
-
-	Friend Function CreateHandObFrames(BigObImage As Bitmap, FrameParameters As IsometricFrameParameters) As Bitmap()
-		Dim BigObImageClone As Bitmap = New Bitmap(BigObImage)
-		Dim Frames As Bitmap()
-		ReDim Frames(8)
+	Friend Function CalculateLayeredSize(FrameParameters As IsometricFrameParameters) As IntVector3
 		Dim SourceSize As Size = New Size(FrameParameters.ItemSize.Width * BigObGrid, FrameParameters.ItemSize.Height * BigObGrid)
 		Dim Size As IntVector3
 		Size = New IntVector3(SourceSize.Width, SourceSize.Height, FrameParameters.ItemThickness)
@@ -105,6 +101,14 @@
 				If Group.Thickness > Size.Z Then Size.Z = Group.Thickness
 			End If
 		Next
+		Return Size
+	End Function
+	Friend Function CreateHandObFrames(BigObImage As Bitmap, FrameParameters As IsometricFrameParameters) As Bitmap()
+		Dim BigObImageClone As Bitmap = New Bitmap(BigObImage)
+		Dim Frames As Bitmap()
+		ReDim Frames(8)
+		Dim Size As IntVector3
+		Size = CalculateLayeredSize(FrameParameters)
 		Dim SourceImage As LayeredBitmap = New LayeredBitmap(BigObImageClone, Size, FrameParameters.ItemThickness, FrameParameters.ThicknessGroups)
 		'For f = 0 To 7
 		'    Frames(f) = MakeIsometricFrame(BigObImage, SourceImage, f, FrameParameters)
@@ -119,8 +123,9 @@
 
 	Friend Function CreateFloorObFrame(BigObImage As Bitmap, FrameParameters As IsometricFrameParameters) As Bitmap
 		Dim BigObImageClone As Bitmap = New Bitmap(BigObImage)
-		Dim SourceSize As Size = New Size(FrameParameters.ItemSize.Width * BigObGrid, FrameParameters.ItemSize.Height * BigObGrid)
-		Dim SourceImage As LayeredBitmap = New LayeredBitmap(BigObImageClone, New IntVector3(SourceSize.Width, SourceSize.Height, FrameParameters.ItemThickness), FrameParameters.ItemThickness, FrameParameters.ThicknessGroups)
+		Dim Size As IntVector3
+		Size = CalculateLayeredSize(FrameParameters)
+		Dim SourceImage As LayeredBitmap = New LayeredBitmap(BigObImageClone, Size, FrameParameters.ItemThickness, FrameParameters.ThicknessGroups)
 
 		Dim Frame As Bitmap
 		Frame = MakeIsometricFrame(BigObImageClone, SourceImage, 8, FrameParameters)

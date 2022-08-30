@@ -88,6 +88,7 @@ Partial Class MainWindow
 		Me.ListBoxRecentFiles = New System.Windows.Forms.ListBox()
 		Me.ButtonLoadFile = New System.Windows.Forms.Button()
 		Me.ButtonSaveFile = New System.Windows.Forms.Button()
+		Me.ButtonLoadOldFile = New System.Windows.Forms.Button()
 		CType(Me.ImageSource, System.ComponentModel.ISupportInitialize).BeginInit()
 		CType(Me.ImageDestinationHandOb, System.ComponentModel.ISupportInitialize).BeginInit()
 		Me.GroupBox1.SuspendLayout()
@@ -700,6 +701,7 @@ Partial Class MainWindow
 		'
 		'GroupBox9
 		'
+		Me.GroupBox9.Controls.Add(Me.ButtonLoadOldFile)
 		Me.GroupBox9.Controls.Add(Me.Label16)
 		Me.GroupBox9.Controls.Add(Me.ListBoxRecentFiles)
 		Me.GroupBox9.Controls.Add(Me.ButtonLoadFile)
@@ -745,6 +747,15 @@ Partial Class MainWindow
 		Me.ButtonSaveFile.TabIndex = 0
 		Me.ButtonSaveFile.Text = "Save"
 		Me.ButtonSaveFile.UseVisualStyleBackColor = True
+		'
+		'ButtonLoadOldFile
+		'
+		Me.ButtonLoadOldFile.Location = New System.Drawing.Point(8, 80)
+		Me.ButtonLoadOldFile.Name = "ButtonLoadOldFile"
+		Me.ButtonLoadOldFile.Size = New System.Drawing.Size(75, 23)
+		Me.ButtonLoadOldFile.TabIndex = 4
+		Me.ButtonLoadOldFile.Text = "Load Old"
+		Me.ButtonLoadOldFile.UseVisualStyleBackColor = True
 		'
 		'MainWindow
 		'
@@ -854,4 +865,5 @@ Partial Class MainWindow
 	Friend WithEvents ButtonExportHandObTFTDPalette As Button
 	Friend WithEvents ButtonExportFloorObTFTDPalette As Button
 	Friend WithEvents ButtonExportFloorObUFOPalette As Button
+	Friend WithEvents ButtonLoadOldFile As Button
 End Class

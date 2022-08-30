@@ -258,8 +258,8 @@
 			MsgBox("Could not render with the selected parameters.", MsgBoxStyle.Critical)
 			Exit Sub
 		End If
-		Dim SourceSize As Size = New Size(FrameParameters.ItemSize.Width * BigObGrid, FrameParameters.ItemSize.Height * BigObGrid)
-		Dim Size As IntVector3 = New IntVector3(SourceSize.Width, SourceSize.Height, FrameParameters.ItemThickness)
+		Dim Size As IntVector3
+		Size = Hl.CalculateLayeredSize(FrameParameters)
 		Dim SourceImage As LayeredBitmap = New LayeredBitmap(MainWindowPtr.GetSourceImage, Size, FrameParameters.ItemThickness, FrameParameters.ThicknessGroups)
 		Dim Surface = SourceImage.GenerateSurface(EEdge.Front)
 		Dim FrontTexture As Bitmap = New Bitmap(Size.Z, Size.X)
@@ -279,8 +279,8 @@
 			MsgBox("Could not render with the selected parameters.", MsgBoxStyle.Critical)
 			Exit Sub
 		End If
-		Dim SourceSize As Size = New Size(FrameParameters.ItemSize.Width * BigObGrid, FrameParameters.ItemSize.Height * BigObGrid)
-		Dim Size As IntVector3 = New IntVector3(SourceSize.Width, SourceSize.Height, FrameParameters.ItemThickness)
+		Dim Size As IntVector3
+		Size = Hl.CalculateLayeredSize(FrameParameters)
 		Dim SourceImage As LayeredBitmap = New LayeredBitmap(MainWindowPtr.GetSourceImage, Size, FrameParameters.ItemThickness, FrameParameters.ThicknessGroups)
 		Dim Surface = SourceImage.GenerateSurface(EEdge.Rear)
 		Dim RearTexture As Bitmap = New Bitmap(Size.Z, Size.X)
